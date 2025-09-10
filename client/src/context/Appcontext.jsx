@@ -28,6 +28,7 @@ export const AppContextProvider = ({ children }) => {
      } else {
         document.documentElement.classList.remove('dark')
      }
+     localStorage.setItem('theme', theme)
    },[theme])
 
    useEffect(() => {
@@ -54,7 +55,8 @@ export const AppContextProvider = ({ children }) => {
        setChats,
        selectedChat,
        setSelectedChat,
-       theme
+       theme,
+       setTheme
     }
 
     return <Appcontext.Provider value={value}>
