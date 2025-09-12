@@ -42,7 +42,7 @@ const Chatbox = () => {
             </div>
           )}
           {messages.map((message,index) => (
-            <Message message={message} />
+            <Message message={message} key={index} />
           ))}
           {
             loading && <div className='loader flex items-center gap-1.5'>
