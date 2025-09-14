@@ -1,4 +1,5 @@
 import { generateToken } from "../config/generateToken.js";
+import Chat from "../models/chat.model.js";
 import User from "../models/user.model.js";
 import bcrypt from 'bcryptjs'
 
@@ -86,6 +87,34 @@ export const getUser = async (req,res) => {
         res.status(200).json({ success:true, user:req.user })
     } catch (error) {
          console.log(error.message)
+        res.status(500).json({
+            success:false,
+            message:'Internal Server Error'
+        })
+    }
+}
+
+export const getPublishedImages = async (req,res) => {
+    try {
+        const publishedImages = await Chat.aggregate([
+            {$unwind: "$messages"},
+            {
+                $match:{
+                    "messages.isImage":true,
+                    "messages.isPublished":true
+                },
+            },
+            {
+                $project:{
+                    _id:0,
+                    imageUrl:"$messages.content",
+                    userName:"$userName"
+                }
+            }
+        ])
+        res.status(200).json({ success:true, images: publishedImages.reverse() })
+    } catch (error) {
+        console.log(error.message)
         res.status(500).json({
             success:false,
             message:'Internal Server Error'
