@@ -5,8 +5,12 @@ import { connectDB } from './config/db.js'
 import userRouter from './routes/user.route.js'
 import chatRouter from './routes/chat.route.js'
 import messageRouter from './routes/message.route.js'
+import planRouter from './routes/transaction.route.js'
+import { stripeWebhooks } from './controllers/webhook.controller.js'
 
 const app = express()
+
+app.post("/api/stripe", express.raw({ type:'application/json' }), stripeWebhooks)
 
 app.use(cors())
 app.use(express.json())
@@ -15,6 +19,7 @@ app.use(express.json())
 app.use("/api/auth", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter)
+app.use("/api/plans", planRouter)
 
 const PORT = process.env.PORT || 5000
 

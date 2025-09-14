@@ -1,5 +1,5 @@
-import Transaction from "../models/transaction.model"
-
+import Transaction from "../models/transaction.model.js"
+import Stripe from 'stripe'
 const plans = [
     {
         _id: "basic",
@@ -33,6 +33,8 @@ export const gettingAllPlans = async (req,res) => {
     }
 }
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
 // purchasing a plan
 
 export const purchasePlan = async (req,res) => {
@@ -51,8 +53,30 @@ export const purchasePlan = async (req,res) => {
             isPaid:false
         })
         
+        const origin = req.headers.origin || process.env.CLIENT_URL || "http://localhost:3000"
+        const session = await stripe.checkout.sessions.create({
+            line_items:[
+                {
+                    price_data:{
+                        currency:"usd",
+                        unit_amount:plan.price * 100,
+                        product_data:{
+                            name:plan.name,
+                        }
+                    },
+                    quantity:1,
+                }
+            ],
+            mode:'payment',
+            success_url:`${origin}/loading`,
+            cancel_url:`${origin}`,
+            metadata: { transactionId: transaction._id.toString(), appId: 'Quickgpt' } 
+        })
+
+        res.status(200).json({ success:true, url:session.url })
+
     } catch (error) {
-        
+        res.status(500).json({ success:false, message:error.message })   
     }
 }
 
