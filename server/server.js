@@ -6,8 +6,11 @@ import userRouter from './routes/user.route.js'
 import chatRouter from './routes/chat.route.js'
 import messageRouter from './routes/message.route.js'
 import planRouter from './routes/transaction.route.js'
+import { stripeWebhooks } from './controllers/webhooks.js'
 
 const app = express()
+
+app.post('/api/stripe', express.raw({ type: 'application/json' }), stripeWebhooks)
 app.use(express.json())
 
 app.use(cors())
